@@ -1,0 +1,85 @@
+/* src/index.css
+   Global reset and design tokens.
+   Keep tokens here; keep component-specific styles in App.css.
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* ── Core palette ──────────────────────────────────────────────────────── */
+  --color-bg:           #080a0e;
+  --color-surface:      #0d1016;
+  --color-surface-2:    #12161e;
+  --color-surface-3:    #171c26;
+  --color-border:       rgba(255, 255, 255, 0.065);
+  --color-border-hover: rgba(255, 255, 255, 0.14);
+  --color-border-accent:rgba(56, 189, 248, 0.35);
+
+  --color-text:         #d4dbe8;
+  --color-text-dim:     #8a96a8;
+  --color-text-muted:   #4a5568;
+  --color-text-micro:   #374151;
+
+  /* ── Accent ──────────────────────────────────────────────────────────── */
+  --color-accent:       #38bdf8;   /* sky-400 — human path */
+  --color-accent-dim:   rgba(56, 189, 248, 0.12);
+  --color-accent-bot:   #fb923c;   /* orange-400 — bot path */
+  --color-accent-bot-dim:rgba(251, 146, 60, 0.10);
+
+  /* ── Event colors (mirror eventRenderer.ts) ─────────────────────────── */
+  --color-kill:   #f43f5e;
+  --color-death:  #a78bfa;
+  --color-storm:  #fbbf24;
+  --color-loot:   #34d399;
+
+  /* ── Spacing ─────────────────────────────────────────────────────────── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+
+  /* ── Typography ──────────────────────────────────────────────────────── */
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  --font-size-micro: 9px;
+  --font-size-xs:    11px;
+  --font-size-sm:    12px;
+  --font-size-base:  14px;
+  --font-size-lg:    16px;
+
+  /* ── Radii ───────────────────────────────────────────────────────────── */
+  --radius-sm:  3px;
+  --radius-md:  5px;
+  --radius-lg:  8px;
+
+  /* ── Transitions ─────────────────────────────────────────────────────── */
+  --transition-fast: 0.1s ease;
+  --transition-std:  0.18s ease;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+button { font-family: inherit; }
+select { font-family: inherit; }

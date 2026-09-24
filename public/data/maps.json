@@ -1,0 +1,23 @@
+[
+  {
+    "mapId": "AmbroseValley",
+    "scale": 900.0,
+    "originX": -370.0,
+    "originZ": -473.0,
+    "minimapFile": "AmbroseValley_Minimap.png"
+  },
+  {
+    "mapId": "GrandRift",
+    "scale": 581.0,
+    "originX": -290.0,
+    "originZ": -290.0,
+    "minimapFile": "GrandRift_Minimap.png"
+  },
+  {
+    "mapId": "Lockdown",
+    "scale": 1000.0,
+    "originX": -500.0,
+    "originZ": -500.0,
+    "minimapFile": "Lockdown_Minimap.jpg"
+  }
+]

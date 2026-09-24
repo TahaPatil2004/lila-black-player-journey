@@ -1,0 +1,20 @@
+{
+  "rawFilesDiscovered": 1243,
+  "rawFilesRead": 1243,
+  "rawFilesFailed": 0,
+  "rawRowsTotal": 89104,
+  "exactDuplicatesRemoved": 1505,
+  "rowsAfterDedup": 87599,
+  "breakdown": {
+    "positionEvents": 72849,
+    "discreteEvents": 14750,
+    "unknownEvents": 0,
+    "unknownEventTypes": []
+  },
+  "invalidMapIds": 0,
+  "invalidMapIdValues": [],
+  "outOfBoundsUV": 0,
+  "matchesWritten": 796,
+  "heatmapsWritten": 3,
+  "failedFiles": []
+}
