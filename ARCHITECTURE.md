@@ -56,7 +56,7 @@ Accurately projecting 3D game coordinates onto 2D top-down minimaps requires rec
 - **Timestamp Semantics:** Raw integer values in the Parquet files evaluate to ~1,770,681,500. Although the Arrow schema labels the column as `timestamp[ms]`, treating these values as milliseconds places matches in January 1970. Interpreting the integer as absolute Unix seconds resolves precisely to February 10–14, 2026. Match timelines compute relative playback seconds as $(t - t_{\min})$.
 - **Event Decoding:** The Parquet `event` column stores raw binary bytes; strings are decoded via UTF-8.
 - **Entity Classification:** Player identifiers matching `^\d+$` (pure numeric strings) are classified as AI bots; UUID strings are classified as human players.
-- **Single-Client Perspective:** In 795 of the 796 recorded matches, telemetry is recorded from a single human client encountering proximate bots. The dataset reflects client-side network visibility, not an omniscient server record.
+- **Single-Client Perspective:** Telemetry is client-recorded rather than omniscient server-side ground truth. Most matches have sparse entity coverage, so the visualization should not be interpreted as a complete lobby reconstruction.
 - **Missing Combat Victims:** `Kill` and `BotKill` records log attacker coordinates but contain no victim identifier or victim location.
 - **Duplicate & Sequence Ordering:** Consecutive position points can share the same 1-second timestamp because the source telemetry has one-second timestamp resolution. Events are ordered deterministically by timestamp and ingestion sequence for rendering and playback.
 
