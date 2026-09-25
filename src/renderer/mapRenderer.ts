@@ -131,8 +131,11 @@ export function renderFrame(opts: RenderOptions): void {
     }
   }
 
-  // ── 5. Draw event markers ─────────────────────────────────────────────────
-  const clusters = buildClusters(events, image.naturalWidth, image.naturalHeight, viewport.scale);
+  // ── 5. Draw event markers (gated to occurred events during playback) ───────
+  const markerEvents = playback
+    ? events.filter((e) => e.relativeSeconds <= (currentTime as number))
+    : events;
+  const clusters = buildClusters(markerEvents, image.naturalWidth, image.naturalHeight, viewport.scale);
   renderEvents({ ctx, clusters, absoluteScale: viewport.scale });
   onClustersBuilt?.(clusters);
 
@@ -165,6 +168,12 @@ export function renderFrame(opts: RenderOptions): void {
 
 // ── Path helpers ──────────────────────────────────────────────────────────────
 
+interface TimedSample {
+  t: number;
+  x: number;
+  y: number;
+}
+
 interface UserPath {
   points: Array<{ x: number; y: number }>;
   entityType: 'human' | 'bot';
@@ -178,19 +187,83 @@ function buildPathsByUser(
   /** null = static mode (include all samples); number = include samples where relativeSeconds <= cutoff */
   timeCutoff?: number | null
 ): Map<string, UserPath> {
-  const map = new Map<string, UserPath>();
+  const userMap = new Map<string, { entityType: 'human' | 'bot'; samples: TimedSample[] }>();
+
   for (const evt of events) {
     if (evt.event !== 'Position' && evt.event !== 'BotPosition') continue;
     if (focusUserId != null && evt.userId !== focusUserId) continue;
-    // Playback time slice: skip samples beyond cutoff
-    if (timeCutoff !== null && timeCutoff !== undefined && evt.relativeSeconds > timeCutoff) continue;
+
     const pt = uvToCanvas(evt.uv.u, evt.uv.v, imgW, imgH);
-    if (!map.has(evt.userId)) {
-      map.set(evt.userId, { points: [], entityType: evt.entityType });
+    let entry = userMap.get(evt.userId);
+    if (!entry) {
+      entry = { entityType: evt.entityType, samples: [] };
+      userMap.set(evt.userId, entry);
     }
-    map.get(evt.userId)!.points.push(pt);
+    entry.samples.push({ t: evt.relativeSeconds, x: pt.x, y: pt.y });
   }
-  return map;
+
+  const result = new Map<string, UserPath>();
+
+  for (const [userId, { entityType, samples }] of userMap) {
+    if (samples.length === 0) continue;
+
+    // Static mode: render complete recorded path without time cutoff
+    if (timeCutoff === null || timeCutoff === undefined) {
+      result.set(userId, {
+        points: samples.map((s) => ({ x: s.x, y: s.y })),
+        entityType,
+      });
+      continue;
+    }
+
+    // Playback mode: timeCutoff is a number (including 0)
+    samples.sort((a, b) => a.t - b.t);
+    const t = timeCutoff;
+
+    // Before first recorded sample: entity not yet active
+    if (t < samples[0].t) {
+      result.set(userId, { points: [], entityType });
+      continue;
+    }
+
+    // At or beyond last sample: entity completed journey
+    if (t >= samples[samples.length - 1].t) {
+      result.set(userId, {
+        points: samples.map((s) => ({ x: s.x, y: s.y })),
+        entityType,
+      });
+      continue;
+    }
+
+    // Binary search for sample segment [i, i+1] where samples[i].t <= t < samples[i+1].t
+    let low = 0;
+    let high = samples.length - 2;
+    let i = 0;
+    while (low <= high) {
+      const mid = (low + high) >> 1;
+      if (samples[mid].t <= t) {
+        i = mid;
+        low = mid + 1;
+      } else {
+        high = mid - 1;
+      }
+    }
+
+    const s0 = samples[i];
+    const s1 = samples[i + 1];
+    const dt = s1.t - s0.t;
+    const frac = dt > 0 ? Math.max(0, Math.min(1, (t - s0.t) / dt)) : 0;
+
+    const interpX = s0.x + (s1.x - s0.x) * frac;
+    const interpY = s0.y + (s1.y - s0.y) * frac;
+
+    const points: Array<{ x: number; y: number }> = samples.slice(0, i + 1).map((s) => ({ x: s.x, y: s.y }));
+    points.push({ x: interpX, y: interpY });
+
+    result.set(userId, { points, entityType });
+  }
+
+  return result;
 }
 
 function drawPath(

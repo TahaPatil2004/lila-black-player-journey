@@ -238,14 +238,6 @@ export default function App() {
     return result;
   }, [events, effectiveFocusUser, eventVis]);
 
-  // ── Playback-gated events ─────────────────────────────────────────────────
-  // null = static mode → pass visibleEvents through unchanged (Phase 3–5 behavior preserved exactly)
-  // number = playback mode → only show events at or before currentTime
-  const playbackEvents = useMemo(() => {
-    if (playback.currentTime === null) return visibleEvents;
-    const ct = playback.currentTime;
-    return visibleEvents.filter((e) => e.relativeSeconds <= ct);
-  }, [visibleEvents, playback.currentTime]);
 
   // ── Handlers ──────────────────────────────────────────────────────────────
 
@@ -553,7 +545,7 @@ export default function App() {
           <MapCanvas
             key={selectedMapId}
             image={minimapImage}
-            events={playbackEvents}
+            events={visibleEvents}
             focusUserId={effectiveFocusUser}
             currentTime={playback.currentTime}
             heatmapMode={heatmapMode}

@@ -1,7 +1,7 @@
 // src/components/MapCanvas.tsx
 // React wrapper around the HTML5 Canvas.
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react';
 import { renderFrame } from '../renderer/mapRenderer';
 import { renderHeatmapToOffscreen } from '../renderer/heatmapRenderer';
 import { useZoomPan } from '../hooks/useZoomPan';
@@ -37,7 +37,6 @@ export function MapCanvas({
 }: MapCanvasProps) {
   const canvasRef    = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const animFrameRef = useRef<number>(0);
   const [size, setSize] = useState({ width: 0, height: 0 });
 
   // ── Offscreen heatmap buffer ────────────────────────────────────────────
@@ -135,18 +134,8 @@ export function MapCanvas({
     });
   }, [image, events, viewport, focusUserId, currentTime, heatmapMode, stormPoints, hotspots, size, onClustersBuilt]);
 
-  // ── Scheduled render ─────────────────────────────────────────────────────
-  const scheduleRender = useCallback(() => {
-    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-    animFrameRef.current = requestAnimationFrame(doRender);
-  }, [doRender]);
-
   // ── Opacity transition RAF ───────────────────────────────────────────────
   // Runs independently to drive smooth heatmap fade in/out.
-  // scheduleRender is called each step so the canvas redraws with updated alpha.
-  // (heatOpacityRef is currently informational; actual opacity comes from
-  //  the offscreen being present or not in renderFrame. For future use with
-  //  per-layer globalAlpha, the ref is wired.)
   useEffect(() => {
     heatTargetRef.current = heatmapMode !== 'none' ? 1 : 0;
 
@@ -156,7 +145,7 @@ export function MapCanvas({
 
     if (reducedMotion) {
       heatOpacityRef.current = heatTargetRef.current;
-      scheduleRender();
+      doRender();
       return;
     }
 
@@ -169,20 +158,22 @@ export function MapCanvas({
       const delta  = (elapsed / OPACITY_TRANSITION_MS) * dir;
       const next   = heatOpacityRef.current + delta;
       heatOpacityRef.current = dir > 0 ? Math.min(target, next) : Math.max(target, next);
-      scheduleRender();
+      doRender();
       if (Math.abs(heatOpacityRef.current - target) > 0.005) {
         opacRafRef.current = requestAnimationFrame(step);
       }
     };
     opacRafRef.current = requestAnimationFrame(step);
     return () => { if (opacRafRef.current) cancelAnimationFrame(opacRafRef.current); };
-  }, [heatmapMode, scheduleRender]);
+  }, [heatmapMode, doRender]);
 
   // ── Main render trigger ──────────────────────────────────────────────────
-  useEffect(() => {
-    scheduleRender();
-    return () => { if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current); };
-  }, [scheduleRender]);
+  // Synchronously paints to the canvas during the React layout phase before browser paint.
+  // This guarantees immediate, continuous rendering driven by playback RAF state without
+  // frame starvation from competing requestAnimationFrame callbacks.
+  useLayoutEffect(() => {
+    doRender();
+  }, [doRender]);
 
   const dpr = window.devicePixelRatio || 1;
 
