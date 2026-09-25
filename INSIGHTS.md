@@ -27,7 +27,7 @@ When toggling between the **Traffic** heatmap and the **Kills** and **Deaths** h
 
 ### Action
 
-Treat route adjustments as balance experiments:
+Possible level-design tests:
 
 1. **Investigate low-combat transit corridors:** Review whether long, quiet routes are intentional rotation highways or if players are bypassing key encounter zones too easily. Test adjusting sightlines or adding minor objective callouts, and monitor whether **route usage** and **player exposure to combat** change.
 2. **Review central combat bottlenecks:** Test adding alternate flanking routes or tiered cover around the central crossroads, and track whether **combat concentration** in the top 10% of cells drops and whether **traffic/combat ratios** distribute more evenly.
