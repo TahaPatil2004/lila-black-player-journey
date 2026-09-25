@@ -86,7 +86,7 @@ The preprocessing pipeline (`data_pipeline/pipeline.py`) performs the following 
    - `heatmaps/<mapId>.json`: Pre-extracted map-level spatial event and movement points used by the frontend to construct 5-day heatmaps.
    - `validation_report.json`: Automated pipeline validation covering row counts, duplicate removal, unknown event types, invalid map IDs, and out-of-bounds UV coordinates.
 
-*Note: The repository includes the preprocessed, browser-ready JSON artifacts under `public/data/`. The application runs immediately out of the box without requiring the original raw Parquet archive.*
+
 
 ## Validation
 
