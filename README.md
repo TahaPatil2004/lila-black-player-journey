@@ -104,7 +104,7 @@ The data pipeline validates the entire dataset during preprocessing (`public/dat
 
 ## Data Notes & Assumptions
 
-- **Recorded Telemetry vs. Ground Truth:** The telemetry captures client-recorded perspectives rather than omniscient server-wide ground truth. In 795 of 796 matches, telemetry reflects one human client encountering proximate bots.
+- **Recorded Telemetry vs. Ground Truth:** Telemetry is client-recorded rather than omniscient server-side ground truth. Most matches have sparse entity coverage, so the visualization should not be interpreted as a complete lobby reconstruction.
 - **Timestamp Semantics:** Raw Parquet integer timestamps evaluate to ~1,770,681,500. Although the Arrow schema annotates the column as `timestamp[ms]`, treating these as milliseconds places matches in January 1970. Interpreting the integer as absolute Unix seconds places matches correctly in February 10–14, 2026. Relative playback seconds are computed per match as $(t - t_{\min})$.
 - **Missing Combat Victim Telemetry:** `Kill` and `BotKill` records log attacker coordinates but contain no victim identifier or victim location.
 - **Entity Classification:** Numeric-only `user_id` values represent server-controlled AI bots; UUID strings represent human client players.
