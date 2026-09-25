@@ -133,8 +133,8 @@ The data pipeline validates the entire dataset during preprocessing (`public/dat
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
-   cd <repository-directory>
+   git clone https://github.com/TahaPatil2004/lila-black-player-journey.git
+   cd lila-black-player-journey
    ```
 
 2. Install dependencies:
