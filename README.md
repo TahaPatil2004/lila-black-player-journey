@@ -4,7 +4,7 @@ An interactive spatial analytics tool for Lila Black Level Designers to explore 
 
 ## Live Demo
 
-Deployment URL: `TODO — add deployed URL before submission`
+Deployment URL: https://lila-black-player-journey-murex.vercel.app/
 
 ## Overview
 
